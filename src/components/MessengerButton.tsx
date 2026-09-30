@@ -1,9 +1,7 @@
 /**
- * Bouton flottant "Discuter sur Messenger" — solution de secours pendant que
- * le widget Facebook Customer Chat integre (voir layout.tsx) est indisponible
- * cote serveurs Meta (xfbml.customerchat.js renvoie 500 depuis des semaines).
- * Aucune dependance au SDK Facebook : simple lien vers m.me, fonctionne
- * toujours. A retirer si le widget integre redevient fonctionnel.
+ * Bouton flottant "Discuter sur Messenger". Simple lien vers m.me, sans SDK
+ * Facebook (le widget Customer Chat integre a ete retire : xfbml.customerchat.js
+ * renvoyait une erreur 500 cote serveurs Meta en continu).
  */
 const MESSENGER_URL = 'https://m.me/1299621413240558';
 
