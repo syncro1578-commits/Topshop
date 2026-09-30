@@ -35,12 +35,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           gtag('js', new Date());
           gtag('config', 'G-965FZFQYSS');
         `}</Script>
+        {/* Facebook Messenger Chat Plugin */}
+        <Script id="fb-customerchat-init" strategy="afterInteractive">{`
+          window.fbAsyncInit = function() {
+            FB.init({ xfbml: true, version: 'v21.0' });
+          };
+        `}</Script>
+        <Script async defer src="https://connect.facebook.net/fr_FR/sdk/xfbml.customerchat.js" strategy="afterInteractive" />
       </head>
       <body style={{ margin: 0, padding: 0, minHeight: '100vh' }}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5N7FR2J" height="0" width="0" style={{ display: 'none', visibility: 'hidden' }} />
         </noscript>
+        {/* Facebook Messenger Chat Plugin */}
+        <div id="fb-root"></div>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: '<div class="fb-customerchat" attribution="setup_tool" page_id="1299621413240558"></div>',
+          }}
+        />
         <AuthProvider>
           <CartProvider>
             <Header categories={categories} />
