@@ -41,7 +41,7 @@ export default function Footer() {
           <div>
             <h4>Suivez-nous</h4>
             <ul>
-              <li><a href="https://www.facebook.com/topshop.tn" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+              <li><a href="https://www.facebook.com/profile.php?id=61594466673346" target="_blank" rel="noopener noreferrer">Facebook</a></li>
               <li><a href="https://www.instagram.com/topshop.tn" target="_blank" rel="noopener noreferrer">Instagram</a></li>
               <li><a href="https://www.tiktok.com/@topshop.tn" target="_blank" rel="noopener noreferrer">TikTok</a></li>
             </ul>
