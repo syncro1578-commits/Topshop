@@ -4,6 +4,7 @@ import './globals.css';
 import './topshop.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import MessengerButton from '@/components/MessengerButton';
 import { api } from '@/lib/woocommerce';
 import { CartProvider } from '@/lib/cart';
 import { AuthProvider } from '@/lib/auth';
@@ -55,6 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             __html: '<div class="fb-customerchat" attribution="setup_tool" page_id="1299621413240558"></div>',
           }}
         />
+        <MessengerButton />
         <AuthProvider>
           <CartProvider>
             <Header categories={categories} />
