@@ -1,9 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import type { WCProduct } from '@/lib/woocommerce';
 import { getProductImage } from '@/lib/woocommerce';
 import { useCart } from '@/lib/cart';
+import { trackViewContent, trackAddToCart } from '@/lib/metaPixel';
 
 function Stars({ value }: { value: number }) {
   const full = Math.floor(value);
@@ -37,10 +38,23 @@ export default function ProductPageClient({ product }: { product: WCProduct }) {
 
   const itemData = { id: Number(product.id), slug: product.slug, name: product.name, price, img: displayImg };
 
+  useEffect(() => {
+    if (product.sku) {
+      trackViewContent({ sku: product.sku, name: product.name, price });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
+
   function handleAdd() {
     addItem(itemData, qty);
+    if (product.sku) trackAddToCart({ sku: product.sku, name: product.name, price, quantity: qty });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
+  }
+
+  function handleBuyNow() {
+    addItem(itemData, qty);
+    if (product.sku) trackAddToCart({ sku: product.sku, name: product.name, price, quantity: qty });
   }
 
   const tabs: { id: 'desc' | 'spec' | 'avis'; label: string }[] = [
@@ -303,7 +317,7 @@ export default function ProductPageClient({ product }: { product: WCProduct }) {
               <button className={`pp-btn pp-btn-primary${added ? ' added' : ''}`} onClick={handleAdd}>
                 {added ? '✓ Ajouté au panier !' : '🛒 Ajouter au panier'}
               </button>
-              <a href="/checkout" className="pp-btn pp-btn-secondary" onClick={() => addItem(itemData, qty)}>
+              <a href="/checkout" className="pp-btn pp-btn-secondary" onClick={handleBuyNow}>
                 ⚡ Acheter maintenant
               </a>
               <button className={`pp-btn pp-btn-tertiary${wished ? ' on' : ''}`} onClick={() => setWished(!wished)}>
@@ -410,7 +424,7 @@ export default function ProductPageClient({ product }: { product: WCProduct }) {
           href="/checkout"
           className="pp-btn pp-btn-secondary"
           style={{ flex: 1 }}
-          onClick={() => addItem(itemData, qty)}
+          onClick={handleBuyNow}
         >
           Acheter
         </a>

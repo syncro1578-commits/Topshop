@@ -69,12 +69,21 @@ export async function POST(req: NextRequest) {
     if (status === 'processing' && orderId != null) {
       const total = parseFloat((order.total as string) || '0');
       if (total > 0) {
+        const rawLineItems = Array.isArray(order.line_items) ? order.line_items as Record<string, unknown>[] : [];
+        const lineItems = rawLineItems
+          .filter(li => typeof li.sku === 'string' && li.sku)
+          .map(li => ({
+            sku: li.sku as string,
+            quantity: Number(li.quantity) || 1,
+            price: Number(li.price) || 0,
+          }));
         sendPurchaseEvent({
           eventId: `order_${orderId}_purchase`,
           value: total,
           currency: (order.currency as string) || 'TND',
           email,
           phone,
+          lineItems,
         }).catch(() => {});
       }
     }

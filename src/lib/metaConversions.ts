@@ -18,6 +18,14 @@ function sha256(value: string): string {
   return crypto.createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
 }
 
+interface PurchaseLineItem {
+  /** SKU WooCommerce (= UUID Shipper), doit correspondre a la colonne "id"
+   * du catalogue Facebook (voir facebook-feed.csv/route.ts). */
+  sku: string;
+  quantity: number;
+  price: number;
+}
+
 interface PurchaseEventInput {
   /** Identifiant stable (ex: `order_123`) pour le dedoublonnage cote Meta
    * si l'evenement est renvoye plusieurs fois pour la meme commande. */
@@ -26,6 +34,7 @@ interface PurchaseEventInput {
   currency: string;
   email?: string;
   phone?: string;
+  lineItems?: PurchaseLineItem[];
 }
 
 /** Envoie un evenement Purchase. N'echoue jamais bruyamment (fire-and-forget) :
@@ -43,6 +52,8 @@ export async function sendPurchaseEvent(input: PurchaseEventInput): Promise<void
     if (digits) userData.ph = [sha256(digits)];
   }
 
+  const skus = (input.lineItems || []).filter(li => li.sku).map(li => li.sku);
+
   const payload = {
     data: [
       {
@@ -55,6 +66,13 @@ export async function sendPurchaseEvent(input: PurchaseEventInput): Promise<void
         custom_data: {
           currency: input.currency,
           value: input.value.toFixed(2),
+          ...(skus.length > 0 && {
+            content_ids: skus,
+            content_type: 'product',
+            contents: (input.lineItems || [])
+              .filter(li => li.sku)
+              .map(li => ({ id: li.sku, quantity: li.quantity, item_price: li.price })),
+          }),
         },
       },
     ],
