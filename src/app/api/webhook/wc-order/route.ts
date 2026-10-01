@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { sendPurchaseEvent } from '@/lib/metaConversions';
 
 /**
  * WooCommerce webhook — order.updated / order.created
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     catch { return NextResponse.json({ ok: true, skipped: true }); }
 
     const email     = (order.billing as Record<string, string> | undefined)?.email;
+    const phone     = (order.billing as Record<string, string> | undefined)?.phone;
     const firstName = (order.billing as Record<string, string> | undefined)?.first_name;
     const orderId   = (order.number ?? order.id) as string | number | undefined;
     const status    = order.status as string | undefined;
@@ -58,6 +60,24 @@ export async function POST(req: NextRequest) {
         wcStatus: status,
       }),
     }).catch(() => {});
+
+    // Meta Conversions API — Achat. Uniquement sur "processing" (premier
+    // statut qui signifie "commande confirmee" dans ce flux COD), pour ne
+    // compter l'achat qu'une seule fois meme si le webhook se redeclenche
+    // plus tard pour "completed"/"on-hold"/etc. event_id stable = dedoublonnage
+    // cote Meta en cas de nouvel essai du webhook pour ce meme statut.
+    if (status === 'processing' && orderId != null) {
+      const total = parseFloat((order.total as string) || '0');
+      if (total > 0) {
+        sendPurchaseEvent({
+          eventId: `order_${orderId}_purchase`,
+          value: total,
+          currency: (order.currency as string) || 'TND',
+          email,
+          phone,
+        }).catch(() => {});
+      }
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
