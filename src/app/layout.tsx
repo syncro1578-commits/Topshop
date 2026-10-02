@@ -12,6 +12,11 @@ import { AuthProvider } from '@/lib/auth';
 export const metadata: Metadata = {
   title: 'Toprix — Meilleurs prix électroménager en Tunisie',
   description: 'Marketplace électroménager n°1 en Tunisie. Meilleurs prix sur réfrigérateurs, friteuses, lave-vaisselle et plus.',
+  verification: {
+    other: {
+      'facebook-domain-verification': '49fmoj954lfdcr8pelq6cgsszapr6m',
+    },
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
